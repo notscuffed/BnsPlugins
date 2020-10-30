@@ -2,10 +2,10 @@
 function(allow_copy_to_client NAME)
     if(${BNSPLUGINS_COPY_TO_CLIENT})
         add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-	        COMMAND "${CMAKE_COMMAND}" -E
-		        copy
-		        "$<TARGET_FILE:${PROJECT_NAME}>"
-		        "${BNSPLUGINS_CLIENT_PATH}/${BIN_FOLDER}/plugins"
+            COMMAND "${CMAKE_COMMAND}" -E
+                copy
+                "$<TARGET_FILE:${PROJECT_NAME}>"
+                "${BNSPLUGINS_CLIENT_PATH}/${BIN_FOLDER}/plugins"
         )
     endif()
 endfunction()

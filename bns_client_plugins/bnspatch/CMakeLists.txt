@@ -17,9 +17,9 @@ target_compile_definitions(${PROJECT_NAME}
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
 target_link_libraries_system(${PROJECT_NAME}
-	PRIVATE
-		pe
-		pluginsdk
+    PRIVATE
+        pe
+        pluginsdk
         fnv1a
         versioninfo
         SafeInt
