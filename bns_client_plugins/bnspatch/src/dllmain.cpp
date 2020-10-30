@@ -113,37 +113,26 @@ void __cdecl InitNotification(const struct InitNotificationData* Data, void* Con
 
     g_DetoursData = Data->Detours;
 
-    std::wstring pipe_name;
+    NtCurrentPeb()->BeingDebugged = FALSE;
+    g_DetoursData->TransactionBegin();
+    g_DetoursData->UpdateThread(NtCurrentThread());
 
-    const wchar_t* OriginalFilename;
-    if (GetModuleVersionInfo(nullptr, L"\\StringFileInfo\\*\\OriginalFilename", &(LPCVOID&)OriginalFilename) < 0)
-        return;
-
-    switch (fnv1a::make_hash(OriginalFilename, fnv1a::ascii_toupper)) {
-    case L"Client.exe"_fnv1au:
-    case L"BNSR.exe"_fnv1au:
-        NtCurrentPeb()->BeingDebugged = FALSE;
-        g_DetoursData->TransactionBegin();
-        g_DetoursData->UpdateThread(NtCurrentThread());
-
-        if (const auto module = pe::get_module(L"ntdll.dll")) {
-            g_DetoursData->Attach2(module, "NtCreateMutant", &(PVOID&)g_pfnNtCreateMutant, &NtCreateMutant_hook);
-            g_DetoursData->Attach2(module, "NtOpenKeyEx", &(PVOID&)g_pfnNtOpenKeyEx, &NtOpenKeyEx_hook);
-            g_DetoursData->Attach2(module, "NtProtectVirtualMemory", &(PVOID&)g_pfnNtProtectVirtualMemory, &NtProtectVirtualMemory_hook);
-            g_DetoursData->Attach2(module, "NtQuerySystemInformation", &(PVOID&)g_pfnNtQuerySystemInformation, &NtQuerySystemInformation_hook);
-            g_DetoursData->Attach2(module, "NtCreateFile", &(PVOID&)g_pfnNtCreateFile, &NtCreateFile_hook);
+    if (const auto module = pe::get_module(L"ntdll.dll")) {
+        g_DetoursData->Attach2(module, "NtCreateMutant", &(PVOID&)g_pfnNtCreateMutant, &NtCreateMutant_hook);
+        g_DetoursData->Attach2(module, "NtOpenKeyEx", &(PVOID&)g_pfnNtOpenKeyEx, &NtOpenKeyEx_hook);
+        g_DetoursData->Attach2(module, "NtProtectVirtualMemory", &(PVOID&)g_pfnNtProtectVirtualMemory, &NtProtectVirtualMemory_hook);
+        g_DetoursData->Attach2(module, "NtQuerySystemInformation", &(PVOID&)g_pfnNtQuerySystemInformation, &NtQuerySystemInformation_hook);
+        g_DetoursData->Attach2(module, "NtCreateFile", &(PVOID&)g_pfnNtCreateFile, &NtCreateFile_hook);
 #ifdef _M_X64
-            g_DetoursData->Attach2(module, "NtQueryInformationProcess", &(PVOID&)g_pfnNtQueryInformationProcess, &NtQueryInformationProcess_hook);
-            g_DetoursData->Attach2(module, "NtSetInformationThread", &(PVOID&)g_pfnNtSetInformationThread, &NtSetInformationThread_hook);
+        g_DetoursData->Attach2(module, "NtQueryInformationProcess", &(PVOID&)g_pfnNtQueryInformationProcess, &NtQueryInformationProcess_hook);
+        g_DetoursData->Attach2(module, "NtSetInformationThread", &(PVOID&)g_pfnNtSetInformationThread, &NtSetInformationThread_hook);
 #endif
-        }
-
-        if (const auto module = pe::get_module(L"user32.dll"))
-            g_DetoursData->Attach2(module, "FindWindowA", &(PVOID&)g_pfnFindWindowA, &FindWindowA_hook);
-
-        g_DetoursData->TransactionCommit();
-        break;
     }
+
+    if (const auto module = pe::get_module(L"user32.dll"))
+        g_DetoursData->Attach2(module, "FindWindowA", &(PVOID&)g_pfnFindWindowA, &FindWindowA_hook);
+
+    g_DetoursData->TransactionCommit();
 }
 
 #ifndef __DATEW__
