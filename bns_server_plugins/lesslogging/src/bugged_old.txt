@@ -1,0 +1,64 @@
+// Patch log: [npc-spawn], cannot spawn npc; already spawned, zone:0x%I64x, spawn-key:0x%I64x
+        patch_jump(module, TO_RVA(0x7FF79E8F5565), TO_RVA(0x7FF79E8F57CB));
+        patch_jump(module, TO_RVA(0x7FF79E8F5574), TO_RVA(0x7FF79E8F57CB));
+
+        patch_jump(module, TO_RVA(0x7FF79E8F5D39), TO_RVA(0x7FF79E8F5FA7));
+        patch_jump(module, TO_RVA(0x7FF79E8F5D49), TO_RVA(0x7FF79E8F5FA7));
+
+        patch_jump(module, TO_RVA(0x7FF79E8F5A3E), TO_RVA(0x7FF79E8F5BBD));
+        patch_jump(module, TO_RVA(0x7FF79E8F5A4D), TO_RVA(0x7FF79E8F5BBD));
+
+        // Patch log: [npc], Npc::OnKilled, npcId:0x%I64x, npcPtr:%p, npcAlias:%s
+        make_jump(module, TO_RVA(0x7FF79E8B5566), TO_RVA(0x7FF79E8B55A8));
+
+        // Patch log: [skill] initilize data, invalid targetFilterData, caster %I64X, data id %d.
+        make_jump(module, TO_RVA(0x7FF79E91FB7B), TO_RVA(0x7FF79E91FBB7));
+
+        // Patch log: [brain], npc:%s, ignored event:%s, current pending event:%s
+        make_jump(module, TO_RVA(0x7FF79E8A31F1), TO_RVA(0x7FF79E8A3249));
+
+        // Patch log: [script], reaction:'%s', line:%d, opponent is not an object, opponent:%I64x
+        // in sub_7FF79E8FE1D0
+        patch_jump(module, TO_RVA(0x7FF79E8FE227), TO_RVA(0x7FF79E8FE385));
+        patch_jump(module, TO_RVA(0x7FF79E8FE230), TO_RVA(0x7FF79E8FE385));
+
+        patch_jump(module, TO_RVA(0x7FF79E8FE283), TO_RVA(0x7FF79E8FE385));
+        patch_jump(module, TO_RVA(0x7FF79E8FE28C), TO_RVA(0x7FF79E8FE385));
+
+        make_jump(module, TO_RVA(0x7FF79E8FE2BF), TO_RVA(0x7FF79E8FE385));
+        make_jump(module, TO_RVA(0x7FF79E8FE247), TO_RVA(0x7FF79E8FE385));
+
+        // in sub_7FF79E8FE030
+        patch_jump(module, TO_RVA(0x7FF79E8FE0E3), TO_RVA(0x7FF79E8FE1B4));
+        patch_jump(module, TO_RVA(0x7FF79E8FE0EC), TO_RVA(0x7FF79E8FE1B4));
+
+        make_jump(module, TO_RVA(0x7FF79E8FE11F), TO_RVA(0x7FF79E8FE1B4));
+        make_jump(module, TO_RVA(0x7FF79E8FE0A7), TO_RVA(0x7FF79E8FE1B4));
+        
+        // Patch log: [brain], movearound to same position(random value is same position), npc-alias:%s, npc:%I64X, curPos:%d;%d;%d, dstPos:%d;%d;%d
+        make_jump(module, TO_RVA(0x7FF79E8A1796), TO_RVA(0x7FF79E8A180B));
+
+        // Patch log: [zone], construct cube, geozone:%d, zoneType2:%d, cubeXSize:%d, cubeYSize:%d, cubeCount:%d
+        make_jump(module, TO_RVA(0x7FF79E640CFD), TO_RVA(0x7FF79E640D4D));
+
+        // Patch log: [serialize object list], grow, this:%p, old count:%d, new count:%d
+        make_jump(module, TO_RVA(0x7FF79EAAC511), TO_RVA(0x7FF79EAAC535));
+
+        // [channel], disabled channel, zone:%I64x, geozone:%d, channel:%d
+        make_jump(module, TO_RVA(0x7FF79E750852), TO_RVA(0x7FF79E7508C5));
+        make_jump(module, TO_RVA(0x7FF79E7508ED), TO_RVA(0x7FF79E750954));
+        
+        // [Campfire], initialize, Campfire : (%I64X), dataId : %d, zone : (%I64X)
+        make_jump(module, TO_RVA(0x7FF79E5DD898), TO_RVA(0x7FF79E5DD8D9));
+
+        // [pc], pc start skill casting, pcId:0x%I64X, name:%s, skillId:%d, skillLevel:%d, currentTime:%I64d, limitTime:%I64d, diffTime:%I64d
+        //make_jump(module, TO_RVA(0x7FF79E926792), TO_RVA(0x7FF79E9267F5));
+
+        // [skill], casting skill, casterId:0x%I64X, targetId:0x%I64X, skillId:%d, skillLevel:%d, time:%I64d
+        //make_jump(module, TO_RVA(0x7FF79E926546), TO_RVA(0x7FF79E92687E));
+        
+        // [duel-bot], duel-bot start skill casting, duel-bot-id:0x%I64x, name:%s, skillId:%d, skillLevel:%d, currentTime:%I64d, limitTime:%I64d, diffTime:%I64d
+        make_jump(module, TO_RVA(0x7FF79E926633), TO_RVA(0x7FF79E92669C));
+
+        // [pc], pc changed stance, pc : %s, old stance : %d, new stance : %d
+        make_jump(module, TO_RVA(0x7FF79E76A036), TO_RVA(0x7FF79E76A072));
