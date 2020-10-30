@@ -71,14 +71,12 @@ void PatchGameGuard() {
 
     auto sections = module->sections();
 
-    auto sectionIt = std::find_if(sections->begin(), sections->end(), [](pe::section& section) {
+    auto codeSection = std::find_if(sections->begin(), sections->end(), [](pe::section& section) {
         return section.executable();
     });
 
-    if (sectionIt == sections->end())
+    if (codeSection == sections->end())
         return;
-
-    auto codeSection = &*sectionIt;
 
     // Find method match
     static auto pattern = load_pattern("83 C4 04 85 C0 74 13 C6 40 ?? 00 C7 00 ?? ?? ?? ?? C7 40 ?? 00 00 00 00 EB 02 33 C0 85 C0 A3 ?? ?? ?? ?? 74 09");
