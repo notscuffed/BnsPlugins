@@ -199,9 +199,9 @@ void __cdecl InitNotification(const struct InitNotificationData* Data, void* Con
 extern "C" __declspec(dllexport)
 void __cdecl GetPluginInfo2(PluginInfo2* plgi)
 {
-    plgi->Name = L"serverpatch";
+    plgi->Name = L"lesslogging";
     plgi->Version = __DATEW__;
-    plgi->Description = L"Patches some GameDaemon01 bullshit";
+    plgi->Description = L"Patches out some GameDaemon01 logging spam";
     plgi->InitNotification = &InitNotification;
     plgi->DllLoadedNotification = &DllLoadedNotification;
 }
