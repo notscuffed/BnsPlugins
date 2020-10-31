@@ -3,6 +3,14 @@
 #ifdef DBG_CONSOLE
 #include <iostream>
 
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#undef WIN32_LEAN_AND_MEAN
+#else
+#include <Windows.h>
+#endif
+
 #define dbg_wprintf(...) wprintf(__VA_ARGS__);
 #define dbg_printf(...) printf(__VA_ARGS__);
 

@@ -30,5 +30,7 @@ add_subdirectory(plugin_loader)
 
 add_subdirectory(bns_client_plugins/antigg)
 add_subdirectory(bns_client_plugins/bnspatch)
+add_subdirectory(bns_client_plugins/whitelistnetwork)
+add_subdirectory(bns_client_plugins/loginhelper)
 
 add_subdirectory(bns_server_plugins/lesslogging)
