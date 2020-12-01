@@ -1,6 +1,9 @@
-## nspattern
+# nspattern
 
-add_library(nspattern STATIC pattern.cpp)
-target_include_directories(nspattern PUBLIC "${CMAKE_CURRENT_LIST_DIR}")
+FetchContent_Declare(
+    extern_nspattern
 
-set_property(TARGET nspattern PROPERTY CXX_STANDARD 20)
+    GIT_REPOSITORY https://github.com/notscuffed/nspattern.git
+)
+
+FetchContent_MakeAvailable_ExcludeFromAll(extern_nspattern)

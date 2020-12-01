@@ -7,7 +7,6 @@ get_filename_component(fc_base "../_deps" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}
 set(FETCHCONTENT_BASE_DIR ${fc_base})
 
 add_subdirectory(pluginsdk)
-add_subdirectory(sockpp)
 add_subdirectory(Detours)
 add_subdirectory(WIL)
 add_subdirectory(phnt)

@@ -57,7 +57,7 @@ void Patch()
         return;
     }
 
-    auto data = std::span<char>((char*)code_segment->data(), code_segment->size());
+    auto data = std::span(code_segment->data(), code_segment->size());
     
     auto username = wil::TryGetEnvironmentVariableW(L"BNS_PROFILE_USERNAME");
     auto password = wil::TryGetEnvironmentVariableW(L"BNS_PROFILE_PASSWORD");

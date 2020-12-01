@@ -13,6 +13,7 @@
 
 #define dbg_wprintf(...) wprintf(__VA_ARGS__);
 #define dbg_printf(...) printf(__VA_ARGS__);
+#define dbg_puts(buffer) puts(buffer);
 
 inline void initialize_dbg_console()
 {
@@ -41,6 +42,7 @@ inline void initialize_dbg_console()
 #else
 #define dbg_wprintf(...)
 #define dbg_printf(...)
+#define dbg_puts(buffer)
 
 #define initialize_dbg_console()
 #endif

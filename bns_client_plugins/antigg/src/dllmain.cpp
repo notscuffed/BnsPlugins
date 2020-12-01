@@ -8,8 +8,7 @@
 #include <pluginsdk.h>
 #include <plugindbg.h>
 #include <versioninfo.h>
-
-#include "pattern.h"
+#include <ns/pattern.h>
 
 const DetoursData* g_DetoursData;
 
@@ -79,15 +78,13 @@ void PatchGameGuard() {
         return;
 
     // Find method match
-    static auto pattern = load_pattern("83 C4 04 85 C0 74 13 C6 40 ?? 00 C7 00 ?? ?? ?? ?? C7 40 ?? 00 00 00 00 EB 02 33 C0 85 C0 A3 ?? ?? ?? ?? 74 09");
-    auto offset = pattern_scan(
-        std::span(codeSection->data(), codeSection->size()),
-        pattern);
+    constexpr auto pattern = COMPILE_PATTERN("83 C4 04 85 C0 74 13 C6 40 ?? 00 C7 00 ?? ?? ?? ?? C7 40 ?? 00 00 00 00 EB 02 33 C0 85 C0 A3 ?? ?? ?? ?? 74 09");
+    auto offset = ns::find_pattern(pattern, *codeSection);
 
-    if (offset == -1)
+    if (offset == ns::no_match)
         return;
 
-    offset = offset - offset % 4;
+    offset -= offset % 4;
 
     // Find method begin
     uint32_t* codeSegmentBegin = (uint32_t*)codeSection->data();

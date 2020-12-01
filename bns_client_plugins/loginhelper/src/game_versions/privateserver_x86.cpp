@@ -4,16 +4,15 @@
 #include <mutex>
 
 #include <plugindbg.h>
-#include <xorstr.hpp>
+#include <ns/pattern.h>
 
 #include "privateserver_x86.h"
 #include "state.h"
-#include "pattern_helper.h"
 
 namespace ps_x86
 {
-    DEFINE_PATTERN(pattern_lobby_helper);
-    DEFINE_PATTERN(pattern_login);
+    constexpr auto LobbyHelperPattern = COMPILE_PATTERN("56 57 8B F1 FF 15 ?? ?? ?? ?? 8B C8 85 C9 0F 84 ?? ?? ?? ?? 8B 7C 24 0C 85 FF");
+    constexpr auto LoginPattern = COMPILE_PATTERN("8B 15 ?? ?? ?? ?? B9 08 00 00 00 39 0D ?? ?? ?? ?? 73 05 BA ?? ?? ?? ?? 39 0D ?? ?? ?? ?? A1 ?? ?? ?? ?? 73 05");
 
     bool(__stdcall* pfnLogin)(const wchar_t* username, const wchar_t* password);
 
@@ -31,28 +30,28 @@ namespace ps_x86
     {   
         static bool is_logged_in = false;
 
-        dbg_printf("LobbyHelper begin\n");
+        dbg_puts("LobbyHelper begin");
 
         if (!is_logged_in)
         {
-            dbg_printf("Creating ExecuteLogin thread\n");
+            dbg_puts("Creating ExecuteLogin thread");
             is_logged_in = true;
             HANDLE thread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)execute_login, nullptr, 0, nullptr);
 
             if (thread)
                 CloseHandle(thread);
             else
-                dbg_printf("Failed to create ExecuteLogin thread\n");
+                dbg_puts("Failed to create ExecuteLogin thread");
         }
 
-        dbg_printf("Calling original LobbyHelper\n");
+        dbg_puts("Calling original LobbyHelper");
         
         auto result = pfnLobbyHelper(self, unk0, unk1);
 
         return result;
     }
 
-    bool hook(std::span<char> data, const wchar_t* username, const wchar_t* password, const wchar_t* pin)
+    bool hook(std::span<unsigned char> data, const wchar_t* username, const wchar_t* password, const wchar_t* pin)
     {
         static std::once_flag once_flag;
 
@@ -63,22 +62,28 @@ namespace ps_x86
         ps_password = password;
 
         // Initialize patterns & find
-        std::call_once(once_flag, []() {
-            INIT_PATTERN(pattern_lobby_helper, 0, "56 57 8B F1 FF 15 ?? ?? ?? ?? 8B C8 85 C9 0F 84 ?? ?? ?? ?? 8B 7C 24 0C 85 FF");
-            INIT_PATTERN(pattern_login, 0, "8B 15 ?? ?? ?? ?? B9 08 00 00 00 39 0D ?? ?? ?? ?? 73 05 BA ?? ?? ?? ?? 39 0D ?? ?? ?? ?? A1 ?? ?? ?? ?? 73 05");
-        });
+        auto lobby_helper_offset = ns::find_pattern(LobbyHelperPattern, data);
+        if (lobby_helper_offset == ns::no_match)
+        {
+            dbg_puts("Failed to find lobby helper pattern");
+            return false;
+        }
 
-        FIND_OR_RETURN(addr_lobby_helper, pattern_lobby_helper);
-        FIND_OR_RETURN(addr_login, pattern_login);
+        auto login_offset = ns::find_pattern(LoginPattern, data);
+        if (login_offset == ns::no_match)
+        {
+            dbg_puts("Failed to find login pattern");
+            return false;
+        }
 
         // Hook
         g_DetoursData->TransactionBegin();
         g_DetoursData->UpdateThread(NtCurrentThread());
 
-        pfnLobbyHelper = (decltype(pfnLobbyHelper))addr_lobby_helper;
+        pfnLobbyHelper = (decltype(pfnLobbyHelper))(data.data() + lobby_helper_offset);
         g_DetoursData->Attach(&(PVOID&)pfnLobbyHelper, lobby_helper);
 
-        pfnLogin = (decltype(pfnLogin))addr_login;
+        pfnLogin = (decltype(pfnLogin))(data.data() + login_offset);
 
         if (g_DetoursData->TransactionCommit() != NO_ERROR)
         {

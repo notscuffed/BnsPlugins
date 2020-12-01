@@ -2,7 +2,7 @@ project(antigg CXX)
 
 add_library(${PROJECT_NAME} SHARED
     "src/dllmain.cpp"
-    "src/pattern.cpp"
+    
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -19,6 +19,7 @@ target_link_libraries_system(${PROJECT_NAME}
         pluginsdk
         fnv1a
         versioninfo
+        nspattern
 )
 
 allow_copy_to_client(${PROJECT_NAME})
