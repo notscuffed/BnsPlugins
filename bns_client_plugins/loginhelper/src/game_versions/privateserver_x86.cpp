@@ -53,8 +53,6 @@ namespace ps_x86
 
     bool hook(std::span<unsigned char> data, const wchar_t* username, const wchar_t* password, const wchar_t* pin)
     {
-        static std::once_flag once_flag;
-
         if (!username || !*username || !password || !*password)
             return false;
 
@@ -87,7 +85,7 @@ namespace ps_x86
 
         if (g_DetoursData->TransactionCommit() != NO_ERROR)
         {
-            dbg_printf("Failed to commit detours\n");
+            dbg_puts("Failed to commit detours");
             return false;
         }
 

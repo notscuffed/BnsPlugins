@@ -6,6 +6,7 @@ add_library(${PROJECT_NAME} SHARED
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE
+        #DBG_CONSOLE
         UNICODE
         _UNICODE
 )

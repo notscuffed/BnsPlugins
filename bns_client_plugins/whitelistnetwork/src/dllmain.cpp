@@ -10,6 +10,7 @@
 #include <pluginsdk.h>
 #include <WinSock2.h>
 #include <ws2tcpip.h>
+#include <wininet.h>
 
 const DetoursData* g_DetoursData;
 std::vector<sockaddr_in> g_Whitelisted;
@@ -20,6 +21,36 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved)
         DisableThreadLibraryCalls(hInstance);
 
     return TRUE;
+}
+
+decltype(&HttpOpenRequestA) g_pfnHttpOpenRequestA;
+extern "C" HINTERNET __stdcall HttpOpenRequestA_hook(
+    _In_ HINTERNET hConnect,
+    _In_opt_ LPCSTR lpszVerb,
+    _In_opt_ LPCSTR lpszObjectName,
+    _In_opt_ LPCSTR lpszVersion,
+    _In_opt_ LPCSTR lpszReferrer,
+    _In_opt_z_ LPCSTR FAR * lplpszAcceptTypes,
+    _In_ DWORD dwFlags,
+    _In_opt_ DWORD_PTR dwContext
+) {
+    dbg_puts("Blocked HttpOpenRequestA");
+    return nullptr;
+}
+
+decltype(&HttpOpenRequestW) g_pfnHttpOpenRequestW;
+extern "C" HINTERNET __stdcall HttpOpenRequestW_hook(
+    _In_ HINTERNET hConnect,
+    _In_opt_ LPCSTR lpszVerb,
+    _In_opt_ LPCSTR lpszObjectName,
+    _In_opt_ LPCSTR lpszVersion,
+    _In_opt_ LPCSTR lpszReferrer,
+    _In_opt_z_ LPCSTR FAR * lplpszAcceptTypes,
+    _In_ DWORD dwFlags,
+    _In_opt_ DWORD_PTR dwContext
+) {
+    dbg_puts("Blocked HttpOpenRequestW");
+    return nullptr;
 }
 
 decltype(&WSAConnect) g_pfnWSAConnect;
@@ -96,7 +127,7 @@ int WSAAPI connect_hook(
 
 void PatchWS2_32(pe::module* module)
 {
-    dbg_wprintf(L"Patching ws2_32.dll\n");
+    dbg_puts("Patching ws2_32.dll");
 
     g_DetoursData->TransactionBegin();
     g_DetoursData->UpdateThread(NtCurrentThread());
@@ -106,7 +137,24 @@ void PatchWS2_32(pe::module* module)
 
     if (g_DetoursData->TransactionCommit() != NO_ERROR)
     {
-        dbg_printf("Failed to commit detours on ws2_32.dll\n");
+        dbg_puts("Failed to commit detours on ws2_32.dll");
+        return;
+    }
+}
+
+void PatchWininet(pe::module* module)
+{
+    dbg_puts("Patching wininet.dll");
+
+    g_DetoursData->TransactionBegin();
+    g_DetoursData->UpdateThread(NtCurrentThread());
+
+    g_DetoursData->Attach2(module, "HttpOpenRequestA", &(PVOID&)g_pfnHttpOpenRequestA, &HttpOpenRequestA_hook);
+    g_DetoursData->Attach2(module, "HttpOpenRequestW", &(PVOID&)g_pfnHttpOpenRequestW, &HttpOpenRequestW_hook);
+
+    if (g_DetoursData->TransactionCommit() != NO_ERROR)
+    {
+        dbg_puts("Failed to commit detours on wininet.dll");
         return;
     }
 }
@@ -117,6 +165,9 @@ void __cdecl DllLoadedNotification(const struct DllNotificationData* Data, void*
     {
     case L"ws2_32.dll"_fnv1al:
         PatchWS2_32(reinterpret_cast<pe::module*>(Data->BaseOfImage));
+        break;
+    case L"wininet.dll"_fnv1al:
+        PatchWininet(reinterpret_cast<pe::module*>(Data->BaseOfImage));
         break;
     }
 }

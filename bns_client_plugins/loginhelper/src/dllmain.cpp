@@ -18,17 +18,12 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD fdwReason, LPVOID lpvReserved)
 {
     if (fdwReason == DLL_PROCESS_ATTACH) {
         DisableThreadLibraryCalls(hInstance);
-
-        if (const auto module = pe::get_module()) {
-            std::wstring_view base_name = module->base_name();
-            if (fnv1a::make_hash(base_name.data(), towlower) != L"client.exe"_fnv1al)
-                return FALSE;
-
-            return TRUE;
-        }
+        
+        if (fnv1a::make_hash(pe::get_module()->base_name().data(), towlower) != L"client.exe"_fnv1al)
+            return FALSE;
     }
 
-    return FALSE;
+    return TRUE;
 }
 
 void Patch()
@@ -38,22 +33,13 @@ void Patch()
     if (patched)
         return;
 
-    const auto module = pe::get_module(L"client.exe");
-
-    if (!module)
-    {
-        dbg_printf("Module not found\n");
-        return;
-    }
-
-    auto sections = module->sections();
-
+    auto sections = pe::get_module()->sections();
     const auto code_segment = std::find_if(sections->begin(), sections->end(), [](pe::section& section) {
         return section.executable();
-        });
+    });
 
     if (code_segment == sections->end()) {
-        dbg_printf("Code segment not found\n");
+        dbg_puts("Code segment not found");
         return;
     }
 
@@ -69,7 +55,6 @@ void Patch()
     if (has_login_details)
     {
         // Hooks are supposed to make copy of username & password
-
         if (!ps_x86::hook(data, username.get(), password.get(), nullptr))
             return;
     }

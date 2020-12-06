@@ -3,7 +3,6 @@ project(loginhelper CXX)
 add_library(${PROJECT_NAME} SHARED
     "src/dllmain.cpp"
     "src/game_versions/privateserver_x86.cpp"
-    "src/pattern_helper.h"
 )
 
 target_compile_definitions(${PROJECT_NAME}
