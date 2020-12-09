@@ -1,8 +1,6 @@
-project(antigg CXX)
+project(bugfixes CXX)
 
-add_library(${PROJECT_NAME} SHARED
-    "src/dllmain.cpp"
-)
+add_library(${PROJECT_NAME} SHARED "src/dllmain.cpp")
 
 target_compile_definitions(${PROJECT_NAME}
     PRIVATE

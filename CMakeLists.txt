@@ -10,7 +10,7 @@ else()
     set(BIN_FOLDER "bin64")
 endif()
 
-option(BNSPLUGINS_UPLOAD_TO_SERVER "Upload to server plugins to server after build?" OFF)
+option(BNSPLUGINS_UPLOAD_TO_SERVER "Upload plugins to server after build?" OFF)
 set(BNSPLUGINS_SERVER_HOST "" CACHE STRING "Upload destination host. Example: 'administrator@host.com'")
 set(BNSPLUGINS_SERVER_PATH "" CACHE STRING "Path on destination server. Example: 'D:/service/GameDaemon01/bin/plugins'")
 
@@ -32,5 +32,6 @@ add_subdirectory(bns_client_plugins/antigg)
 add_subdirectory(bns_client_plugins/bnspatch)
 add_subdirectory(bns_client_plugins/whitelistnetwork)
 add_subdirectory(bns_client_plugins/loginhelper)
+add_subdirectory(bns_client_plugins/bugfixes)
 
 add_subdirectory(bns_server_plugins/lesslogging)

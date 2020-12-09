@@ -27,18 +27,14 @@ void __cdecl DllLoadedNotification(const struct DllNotificationData* Data, void*
 {
     switch (fnv1a::make_hash(Data->Name, towlower))
     {
-    case L"netutils.dll"_fnv1al:
-    case L"netapi32.dll"_fnv1al:
     case L"ws2_32.dll"_fnv1al:
     case L"psapi.dll"_fnv1al:
 
         __try
         {
-            if (   *(uint64_t*)0x5D54F7 == 0x75'C0'84'00'6C'2A'54'E8
-                && *(uint64_t*)0x5D5548 == 0x8B'01'B0'00'6C'30'63'E8)
+            if (*(uint64_t*)0x51474F == 0x0F'32'00'00'00'9C'B8'80)
             {
-                memset((void*)0x5D54F7, 0x90, 5); // Load game guard
-                memset((void*)0x5D5548, 0x90, 5); // Load aegisty
+                *(unsigned char*)(0x51474F + 6) = 11; // Join crafting guild at 11 level
             }
         }
         __except (1)
@@ -58,8 +54,8 @@ extern "C"
 __declspec(dllexport)
 void __cdecl GetPluginInfo2(PluginInfo2 * plgi)
 {
-    plgi->Name = L"antigg";
+    plgi->Name = L"bugfixes";
     plgi->Version = __DATEW__;
-    plgi->Description = L"Bypasses GameGuard";
+    plgi->Description = L"Fixes bugs";
     plgi->DllLoadedNotification = &DllLoadedNotification;
 }
